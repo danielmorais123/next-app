@@ -23,6 +23,7 @@ const Register = () => {
      
         if (err.code.includes("already-in-use")) {
           setError("Email já está a ser utilizado. Escolha outro.");
+          return;
         }
       });
 

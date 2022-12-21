@@ -15,45 +15,36 @@ export const AuthContextProvider = ({
   const [user, setUser] = useState<User | null>();
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log({ firebase: user });
-        setUser({
-          accessToken: user.accessToken,
+    const unsub = onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        let userToSave = {
           id: null,
-          email: user.email,
-          emailConfirmed: user.emailVerified,
-          displayName: user.displayName,
-          photoUrl: user.photoURL,
-          uid: user.uid,
-          phoneNumber: user.phoneNumber,
-        });
-        fetch(`http://localhost:3000/api/users/${user?.uid}`, {
+          email: authUser.email,
+          emailConfirmed: authUser.emailVerified,
+          displayName: authUser?.displayName,
+          photoUrl: authUser?.photoURL,
+          uid: authUser.uid,
+          phoneNumber: authUser?.phoneNumber,
+        };
+
+        fetch(`http://localhost:3000/api/users/${userToSave?.uid}`, {
           method: "POST",
           mode: "same-origin",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(user),
+          body: JSON.stringify(userToSave),
         })
           .then((value) => value.json())
           .then((res) => {
-            console.log({ res });
-          });
-
-        fetch(`http://localhost:3000/api/users/${user?.uid}`)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log({ data });
             setUser({
-              accessToken: data.user.accessToken,
-              id: data.user._id,
-              email: user.email,
-              emailConfirmed: data.user?.emailVerified,
-              displayName: data.user?.displayName,
-              photoUrl: data.user?.photoURL,
-              uid: data.user?.uid,
-              phoneNumber: data.user?.phoneNumber,
+              email: res.user[0]?.email,
+              emailConfirmed: res.user[0]?.emailConfirmed,
+              displayName: res.user[0]?.displayName,
+              photoUrl: res.user[0]?.photoUrl,
+              uid: res.user[0]?.uid,
+              phoneNumber: res.user[0]?.phoneNumber,
+              id: res.user[0]?._id,
             });
           });
       } else {

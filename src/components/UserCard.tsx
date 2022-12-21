@@ -14,7 +14,7 @@ const UserCard = () => {
   const { user } = useAuth();
 
   const sendVerificationEmail = () => {
-    sendEmailVerification(auth.currentUser).then(() => {
+    sendEmailVerification(auth?.currentUser).then(() => {
       console.log("Email Sent");
     });
   };
@@ -36,6 +36,7 @@ const UserCard = () => {
   if (!user) {
     return null;
   }
+
   return (
     <div className="bg-[#1A1A1A] w-full xl:w-[350px] xl:min-w-[310px]  rounded-xl  ">
       <div className="w-[90%] mx-auto">
@@ -56,7 +57,7 @@ const UserCard = () => {
             </div>
           </div>
           <button>
-            <FontAwesomeIcon icon={faGear} />
+            <FontAwesomeIcon icon={faGear} className="animate-spin" />
           </button>
         </div>
         <div className="border border-gray-700/20" />

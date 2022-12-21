@@ -2,6 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "../../../lib/mongodb";
 import { ObjectId } from "mongodb";
 
+interface FriendList {
+  status: string;
+  friendId: string;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -9,19 +14,13 @@ export default async function handler(
   const client = await clientPromise;
   const db = client.db("nextjsmongo");
   switch (req.method) {
-    case "POST":
-      let body = req.body;
-
-      let myPost = await db.collection("post").insertOne(body);
-      let postById = await db
-        .collection("post")
-        .findOne({ _id: new ObjectId(myPost.insertedId) });
-      res.json(postById);
-      break;
     case "GET":
-      let posts = await db.collection("post").find({}).toArray();
-
-      res.json({ posts });
+      let id = req.query.id;
+      const friend = await db
+        .collection("friend")
+        .find({ userId: id })
+        .toArray();
+      res.json({ friend });
       break;
     default:
       res.setHeader("Allow", ["POST", "GET"]);
