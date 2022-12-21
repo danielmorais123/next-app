@@ -17,6 +17,15 @@ export const AuthContextProvider = ({
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
+        let provider: string;
+
+        if (authUser?.providerData[0]?.providerId === "google.com") {
+          provider = "Google";
+        } else if (authUser?.providerData[0]?.providerId === "facebook.com") {
+          provider = "Facebook";
+        } else {
+          provider = "Email";
+        }
         let userToSave = {
           id: null,
           email: authUser.email,
@@ -25,6 +34,7 @@ export const AuthContextProvider = ({
           photoUrl: authUser?.photoURL,
           uid: authUser.uid,
           phoneNumber: authUser?.phoneNumber,
+          provider,
         };
 
         fetch(`http://localhost:3000/api/users/${userToSave?.uid}`, {
@@ -45,6 +55,7 @@ export const AuthContextProvider = ({
               uid: res.user[0]?.uid,
               phoneNumber: res.user[0]?.phoneNumber,
               id: res.user[0]?._id,
+              provider,
             });
           });
       } else {

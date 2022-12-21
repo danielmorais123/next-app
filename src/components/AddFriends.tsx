@@ -11,7 +11,11 @@ import { useAuth } from "../context/AuthContext";
 import { BASE_URL } from "../lib/baseUrls";
 import { FriendsList, UserToAdd } from "../types/typing";
 import { useDispatch } from "react-redux";
-import { addFriend, selectFriends } from "../redux/slices/friendsSlice";
+import {
+  addFriend,
+  removeFriend,
+  selectFriends,
+} from "../redux/slices/friendsSlice";
 import { useSelector } from "react-redux";
 
 const AddFriends = () => {
@@ -52,7 +56,31 @@ const AddFriends = () => {
       });
   };
 
-  const declineFriend = () => {};
+  const declineFriend = (friendId: string, toAddUser: UserToAdd) => {
+    fetch(`${BASE_URL}/api/friend`, {
+      method: "PUT",
+      mode: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user?.id,
+        friendId,
+        toAddUser,
+        type: "Decline Friend Request",
+        user,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log({ data });
+        if (data.status) {
+          setErr(data.status);
+          return;
+        }
+        dispatch(removeFriend(friendId));
+      });
+  };
 
   const addNewFriend = (friendId: string, toAddUser: UserToAdd) => {
     fetch(`${BASE_URL}/api/friend`, {
@@ -145,7 +173,7 @@ const AddFriends = () => {
                     <FontAwesomeIcon
                       icon={faCircleXmark}
                       className="bg-red-500 p-2 rounded-full text-sm cursor-pointer"
-                      onClick={declineFriend}
+                      onClick={() => declineFriend(toAddUser?._id, toAddUser)}
                     />
                   </div>
                 ) : null}

@@ -13,7 +13,7 @@ export const friendsSlice = createSlice({
       state.friends = [...action.payload];
     },
     removeFriend: (state, action) => {
-      let newArray = [...action.payload];
+      let newArray = [...state.friends];
       let index = state.friends.findIndex(
         (friend) => friend?.friendId === action.payload
       );

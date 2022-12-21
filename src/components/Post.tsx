@@ -17,7 +17,7 @@ import { STORAGE_URL } from "../lib/supabase";
 import { BASE_URL } from "../lib/baseUrls";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
-import { addFriend, selectFriends } from "../redux/slices/friendsSlice";
+import { addFriend, removeFriend, selectFriends } from "../redux/slices/friendsSlice";
 
 interface PostProps {
   post: PostType;
@@ -78,7 +78,7 @@ const Post = (props: PostProps) => {
         dispatch(addFriend(data?.friendsUser[0]?.friends));
       });
   };
- // TO DO DECLINE BACKEND
+  // TO DO DECLINE BACKEND
   const declineFriend = (friendId: string, toAddUser: UserToAdd) => {
     fetch(`${BASE_URL}/api/friend`, {
       method: "PUT",
@@ -96,11 +96,12 @@ const Post = (props: PostProps) => {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log({ data });
         if (data.status) {
           setErr(data.status);
           return;
         }
-        dispatch(addFriend(data?.friendsUser[0]?.friends));
+        dispatch(removeFriend(friendId));
       });
   };
 
@@ -314,7 +315,13 @@ const Post = (props: PostProps) => {
               <FontAwesomeIcon
                 icon={faCircleXmark}
                 className="bg-red-500 p-2 rounded-full text-sm cursor-pointer"
-                onClick={declineFriend}
+                onClick={
+                  () =>
+                    /* @ts-ignore */ declineFriend(
+                      post?.user?.id,
+                      post?.user
+                    ) /* @ts-ignore */
+                }
               />
             </div>
           ) : null}

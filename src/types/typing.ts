@@ -8,6 +8,7 @@ export type User = {
   displayName: string | null;
   emailConfirmed: boolean | null;
   id: string | null;
+  provider: string | null;
 };
 
 export type PostType = {
@@ -45,9 +46,9 @@ export interface Notification {
 export interface NotificationList {
   type: string;
   description: string;
-  userSender: User;
-  created_at: string;
-  userSenderId: string;
+  userSender: User | null;
+  created_at: string | Date;
+  userSenderId: string | null;
 }
 
 export interface FriendsList {
@@ -55,4 +56,5 @@ export interface FriendsList {
   friendId: string;
   sent: boolean;
   created_at: string;
+  user: User;
 }

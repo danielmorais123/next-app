@@ -1,18 +1,24 @@
 import { Button, Modal, Upload, UploadFile } from "antd";
-import React, { useState } from "react";
+import React, { SetStateAction, useState, Dispatch } from "react";
 import { poppins } from "../fonts/fonts";
 import { PlusOutlined } from "@ant-design/icons";
 import { BASE_URL } from "../lib/baseUrls";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { User } from "../types/typing";
-const ModalUserInfo = ({ openUserModal, setOpenUserModal }) => {
+
+interface ModalUserInfoProps {
+  openUserModal: boolean;
+  setOpenUserModal: Dispatch<SetStateAction<boolean>>;
+}
+
+const ModalUserInfo = (modalProps: ModalUserInfoProps) => {
+  const { openUserModal, setOpenUserModal } = modalProps;
   const [name, setName] = useState<string>("");
   const [file, setFile] = useState<File | null>();
   const [err, setErr] = useState<string>("");
   const { user, setUser } = useAuth();
 
-  console.log({ err });
   const handleSubmit = async () => {
     if (file) {
       const { error } = await supabase.storage
@@ -39,6 +45,7 @@ const ModalUserInfo = ({ openUserModal, setOpenUserModal }) => {
           photoUrl: data.user?.photoUrl,
           uid: data.user?.uid,
           phoneNumber: data.user?.phoneNumber,
+          provider: data.user?.provider,
         };
         setUser(userUpdate);
       });
@@ -49,7 +56,7 @@ const ModalUserInfo = ({ openUserModal, setOpenUserModal }) => {
       className={`${poppins.className}`}
       title="Update User Information"
       centered
-      //open={openUserModal}
+      open={openUserModal}
       closable={false}
       onOk={() => {}}
       okType="danger"
@@ -132,7 +139,12 @@ const ModalUserInfo = ({ openUserModal, setOpenUserModal }) => {
                   id="dropzone-file"
                   type="file"
                   className="hidden"
-                  onChange={(e) => setFile(e.target.files[0])}
+                  onChange={
+                    (e) =>
+                      /* @ts-ignore */ setFile(
+                        e.target.files[0]
+                      ) /* @ts-ignore */
+                  }
                 />
               </label>
             </div>

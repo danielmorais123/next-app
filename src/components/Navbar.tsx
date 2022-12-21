@@ -38,7 +38,6 @@ const Navbar = (props: any) => {
       });
   }, [user]);
 
- 
   let menus = (
     <div
       key="1"
@@ -108,11 +107,11 @@ const Navbar = (props: any) => {
       <div className="w-[90%] mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <p
-            className={`tracking-wide text-2xl text-[#6C63FF] leading-10 ${anton.className} `}
+            onClick={() => router.push("/")}
+            className={`tracking-wide text-2xl text-[#6C63FF] leading-10 cursor-pointer ${anton.className} `}
           >
             Social Network{" "}
           </p>
-        
         </div>
         <div className="md:w-[30%] mx-auto">
           <form className="relative cursor-pointer hidden md:flex">

@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "../../../lib/mongodb";
-import { UpdateUserObject } from "../../../types/typing";
+import {
+  Notification,
+  NotificationList,
+  UpdateUserObject,
+} from "../../../types/typing";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,6 +27,7 @@ export default async function handler(
           phoneNumber: req.body.phoneNumber,
           emailConfirmed: req.body.emailConfirmed,
           created_at: new Date(),
+          provider: req.body.provider,
         });
 
         const userDbToReturn = await db
@@ -30,9 +35,19 @@ export default async function handler(
           .find({ uid: req.query.id })
           .toArray();
 
+        let notifications: NotificationList[] = [
+          {
+            type: "Welcome",
+            description: `Welcome ${req.body?.email}`,
+            created_at: new Date(),
+            userSender: null,
+            userSenderId: null,
+          },
+        ];
+
         await db.collection("notification").insertOne({
           userId: userDbToReturn[0]._id.toString(),
-          notifications: [],
+          notifications,
         });
         await db.collection("friend").insertOne({
           userId: userDbToReturn[0]._id.toString(),

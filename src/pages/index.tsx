@@ -1,6 +1,4 @@
 import Navbar from "../components/Navbar";
-import { GetServerSideProps } from "next";
-import axios from "axios";
 import UserCard from "../components/UserCard";
 import PostAdd from "../components/PostAdd";
 import Post from "../components/Post";
@@ -9,7 +7,6 @@ import Drawer from "../components/Drawer";
 import { useAuth } from "../context/AuthContext";
 import AddFriends from "../components/AddFriends";
 import Annouce from "../components/Annouce";
-import { supabase } from "../lib/supabase";
 import { PostType } from "../types/typing";
 import ModalUserInfo from "../components/ModalUserInfo";
 import ConfirmEmail from "../components/ConfirmEmail";
@@ -39,7 +36,7 @@ function enableScrolling() {
 
 export default function Home(props: Props) {
   const [open, setOpen] = useState(false);
-  const [openUserModal, setOpenUserModal] = useState(false);
+  const [openUserModal, setOpenUserModal] = useState<boolean>(false);
   const [posts, setPosts] = useState<PostType[]>([]);
   const dispatch = useDispatch();
 
@@ -65,6 +62,7 @@ export default function Home(props: Props) {
     fetch(`${BASE_URL}/api/friend/${user?.id}`)
       .then((res) => res.json())
       .then((data) => {
+        if(!data.friend[0]?.friends) return;
         dispatch(addFriend(data.friend[0]?.friends));
       });
   }, [user]);
@@ -80,7 +78,7 @@ export default function Home(props: Props) {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] w-full relative overflow-x-hidden ">
+    <div className="min-h-screen bg-[#242424] w-full relative overflow-x-hidden ">
       {" "}
       {open ? <Drawer setOpen={setOpen} /> : null}
       {openUserModal ? (
@@ -91,7 +89,7 @@ export default function Home(props: Props) {
       ) : null}
       <div className={`${open ? " pointer-events-none blur-sm" : null}`}>
         <Navbar setOpen={setOpen} />
-        <div className="mx-auto  w-[90%] mt-5 flex flex-col xl:flex-row items-start xl:space-x-10 ">
+        <div className="mx-auto  w-[95%] mt-5 flex flex-col xl:flex-row items-start xl:space-x-10 ">
           <div className="w-full xl:w-fit hidden xl:flex xl:flex-col">
             <UserCard />
             <ConfirmEmail />
@@ -102,8 +100,11 @@ export default function Home(props: Props) {
             {posts
               .sort(function (a, b) {
                 return (
+                  /* @ts-ignore */
                   new Date(b.created_at).getTime() -
-                  new Date(a.created_at).getTime()
+                  /* @ts-ignore */ new Date(
+                    a.created_at
+                  ).getTime() /* @ts-ignore */
                 );
               })
               .map((post, index) => (
