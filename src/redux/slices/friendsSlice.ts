@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { FriendsList } from "../../types/typing";
 
-const initialState = {
+interface InitialState {
+  friends: FriendsList[];
+}
+
+const initialState: InitialState = {
   friends: [],
 };
 

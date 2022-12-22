@@ -11,8 +11,9 @@ import { PostType } from "../types/typing";
 import ModalUserInfo from "../components/ModalUserInfo";
 import ConfirmEmail from "../components/ConfirmEmail";
 import { BASE_URL } from "../lib/baseUrls";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addFriend } from "../redux/slices/friendsSlice";
+import { selectPosts, setPosts } from "../redux/slices/postSlice";
 
 type Data = {
   id: number;
@@ -37,10 +38,11 @@ function enableScrolling() {
 export default function Home(props: Props) {
   const [open, setOpen] = useState(false);
   const [openUserModal, setOpenUserModal] = useState<boolean>(false);
-  const [posts, setPosts] = useState<PostType[]>([]);
   const dispatch = useDispatch();
-
+  const posts: PostType[] = useSelector(selectPosts);
   const { user, setUser } = useAuth();
+
+  console.log({ posts });
 
   useEffect(() => {
     if (open) {
@@ -54,7 +56,10 @@ export default function Home(props: Props) {
   useEffect(() => {
     fetch("http://localhost:3000/api/post")
       .then((res) => res.json())
-      .then((data) => setPosts(data.posts));
+      .then((data) => {
+        console.log({ data });
+        dispatch(setPosts(data.posts));
+      });
   }, []);
 
   useEffect(() => {
@@ -62,7 +67,7 @@ export default function Home(props: Props) {
     fetch(`${BASE_URL}/api/friend/${user?.id}`)
       .then((res) => res.json())
       .then((data) => {
-        if(!data.friend[0]?.friends) return;
+        if (!data.friend[0]?.friends) return;
         dispatch(addFriend(data.friend[0]?.friends));
       });
   }, [user]);
@@ -70,6 +75,7 @@ export default function Home(props: Props) {
   //console.log({name: user.displayName});
 
   useEffect(() => {
+    if (!user) return;
     if (user?.displayName) {
       setOpenUserModal(false);
       return;
@@ -78,7 +84,7 @@ export default function Home(props: Props) {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-[#242424] w-full relative overflow-x-hidden ">
+    <div className="min-h-screen bg-[#222222] w-full relative overflow-x-hidden ">
       {" "}
       {open ? <Drawer setOpen={setOpen} /> : null}
       {openUserModal ? (
@@ -96,7 +102,7 @@ export default function Home(props: Props) {
           </div>
 
           <div className="flex flex-col flex-grow w-full xl:w-fit my-5 xl:my-0 space-y-4">
-            <PostAdd posts={posts} setPosts={setPosts} />
+            <PostAdd />
             {posts
               .sort(function (a, b) {
                 return (
@@ -112,8 +118,6 @@ export default function Home(props: Props) {
                   key={post._id}
                   post={post}
                   lastPost={posts.length - 1 === index}
-                  setPosts={setPosts}
-                  posts={posts}
                 />
               ))}
           </div>

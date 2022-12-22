@@ -12,7 +12,7 @@ const ConfirmEmail = () => {
       console.log("Email Sent");
     });
   };
-
+  if(!user) return null;
   if (user?.emailConfirmed) return null;
   return (
     <div className="bg-[#ffb24e] rounded-lg text-[#1a1a1a] flex flex-row my-5 items-center ">

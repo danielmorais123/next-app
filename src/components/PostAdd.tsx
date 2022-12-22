@@ -5,15 +5,14 @@ import { faImage, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { supabase } from "../lib/supabase";
 import { BASE_URL } from "../lib/baseUrls";
 import { PostType } from "../types/typing";
+import { useDispatch, useSelector } from "react-redux";
+import { selectPosts, setPosts } from "../redux/slices/postSlice";
 
-type PostAddProps = {
-  posts: PostType[];
-  setPosts: Dispatch<SetStateAction<PostType[]>>;
-};
 
-const PostAdd = (props: PostAddProps) => {
-  const { posts, setPosts } = props;
+const PostAdd = () => {
+  const posts: PostType[] = useSelector(selectPosts);
   const { user } = useAuth();
+  const dispatch = useDispatch();
 
   const [file, setFile] = useState<File>();
   const [err, setErr] = useState<string>("");
@@ -72,7 +71,7 @@ const PostAdd = (props: PostAddProps) => {
             comments: data.comments,
           },
         ];
-        setPosts(newPosts);
+        dispatch(setPosts(newPosts));
       });
 
     setComment("");

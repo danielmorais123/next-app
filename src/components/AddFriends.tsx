@@ -25,6 +25,7 @@ const AddFriends = () => {
   const dispatch = useDispatch();
   const friends: FriendsList[] = useSelector(selectFriends);
 
+  console.log({ friends });
   useEffect(() => {
     fetch(`${BASE_URL}/api/users`)
       .then((res) => res.json())
@@ -140,74 +141,80 @@ const AddFriends = () => {
                     <p className="text-gray-100/20 text-xs">3 Followers</p>
                   </div>
                 </div>
-                {friends?.some(
-                  (friend) =>
-                    friend.friendId === toAddUser?._id &&
-                    friend.sent === true &&
-                    friend?.status === "pending"
-                ) ? (
-                  <FontAwesomeIcon
-                    icon={faEnvelopeCircleCheck}
-                    className="bg-indigo-500 p-2 rounded-full text-sm cursor-pointer"
-                  />
-                ) : null}
-                {friends?.some(
-                  (friend) =>
-                    friend.friendId === toAddUser._id &&
-                    friend.sent === false &&
-                    friend?.status === "pending"
-                ) ? (
-                  <div className="flex items-center space-x-1">
-                    {" "}
-                    <FontAwesomeIcon
-                      icon={faCircleCheck}
-                      className="bg-green-500 p-2 rounded-full text-sm cursor-pointer"
-                      onClick={
-                        () =>
-                          /* @ts-ignore */ acceptFriend(
-                            toAddUser?._id,
-                            toAddUser
-                          ) /* @ts-ignore */
-                      }
-                    />
-                    <FontAwesomeIcon
-                      icon={faCircleXmark}
-                      className="bg-red-500 p-2 rounded-full text-sm cursor-pointer"
-                      onClick={() => declineFriend(toAddUser?._id, toAddUser)}
-                    />
-                  </div>
-                ) : null}
-                {!friends?.some(
-                  (friend) => friend.friendId === toAddUser._id
-                ) ? (
-                  <FontAwesomeIcon
-                    icon={faUserPlus}
-                    className="bg-blue-600 p-2 rounded-full text-sm cursor-pointer"
-                    onClick={
-                      () =>
-                        /* @ts-ignore */ addNewFriend(
-                          toAddUser?._id,
-                          toAddUser
-                        ) /* @ts-ignore */
-                    }
-                  />
-                ) : null}
-                {friends?.some(
-                  (friend) =>
-                    friend.friendId === toAddUser._id &&
-                    friend?.status === "accepted"
-                ) ? (
-                  <FontAwesomeIcon
-                    icon={faUsers}
-                    className="bg-blue-600 p-2 rounded-full text-sm "
-                    onClick={
-                      () =>
-                        /* @ts-ignore */ addNewFriend(
-                          toAddUser?._id,
-                          toAddUser
-                        ) /* @ts-ignore */
-                    }
-                  />
+                {user ? (
+                  <>
+                    {friends?.some(
+                      (friend) =>
+                        friend.friendId === toAddUser?._id &&
+                        friend.sent === true &&
+                        friend?.status === "pending"
+                    ) ? (
+                      <FontAwesomeIcon
+                        icon={faEnvelopeCircleCheck}
+                        className="bg-indigo-500 p-2 rounded-full text-sm cursor-pointer"
+                      />
+                    ) : null}
+                    {friends?.some(
+                      (friend) =>
+                        friend.friendId === toAddUser._id &&
+                        friend.sent === false &&
+                        friend?.status === "pending"
+                    ) ? (
+                      <div className="flex items-center space-x-1">
+                        {" "}
+                        <FontAwesomeIcon
+                          icon={faCircleCheck}
+                          className="bg-green-500 p-2 rounded-full text-sm cursor-pointer"
+                          onClick={
+                            () =>
+                              /* @ts-ignore */ acceptFriend(
+                                toAddUser?._id,
+                                toAddUser
+                              ) /* @ts-ignore */
+                          }
+                        />
+                        <FontAwesomeIcon
+                          icon={faCircleXmark}
+                          className="bg-red-500 p-2 rounded-full text-sm cursor-pointer"
+                          onClick={() =>
+                            declineFriend(toAddUser?._id, toAddUser)
+                          }
+                        />
+                      </div>
+                    ) : null}
+                    {!friends?.some(
+                      (friend) => friend.friendId === toAddUser._id
+                    ) ? (
+                      <FontAwesomeIcon
+                        icon={faUserPlus}
+                        className="bg-blue-600 p-2 rounded-full text-sm cursor-pointer"
+                        onClick={
+                          () =>
+                            /* @ts-ignore */ addNewFriend(
+                              toAddUser?._id,
+                              toAddUser
+                            ) /* @ts-ignore */
+                        }
+                      />
+                    ) : null}
+                    {friends?.some(
+                      (friend) =>
+                        friend.friendId === toAddUser._id &&
+                        friend?.status === "accepted"
+                    ) ? (
+                      <FontAwesomeIcon
+                        icon={faUsers}
+                        className="bg-blue-600 p-2 rounded-full text-sm "
+                        onClick={
+                          () =>
+                            /* @ts-ignore */ addNewFriend(
+                              toAddUser?._id,
+                              toAddUser
+                            ) /* @ts-ignore */
+                        }
+                      />
+                    ) : null}
+                  </>
                 ) : null}
               </div>
             );

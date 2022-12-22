@@ -17,13 +17,16 @@ import { STORAGE_URL } from "../lib/supabase";
 import { BASE_URL } from "../lib/baseUrls";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
-import { addFriend, removeFriend, selectFriends } from "../redux/slices/friendsSlice";
+import {
+  addFriend,
+  removeFriend,
+  selectFriends,
+} from "../redux/slices/friendsSlice";
+import { selectPosts, setPosts } from "../redux/slices/postSlice";
 
 interface PostProps {
   post: PostType;
   lastPost: boolean;
-  posts: PostType[];
-  setPosts: Dispatch<SetStateAction<PostType[]>>;
 }
 
 interface Comment {
@@ -33,12 +36,13 @@ interface Comment {
 }
 
 const Post = (props: PostProps) => {
-  const { post, posts, setPosts } = props;
+  const { post } = props;
   const { user } = useAuth();
   const [comment, setComment] = useState<boolean>(false);
   const [theComment, setTheComment] = useState<string>("");
   const [displayComment, setDisplayComment] = useState<Comment>();
   const [err, setErr] = useState("false");
+  const posts: PostType[] = useSelector(selectPosts);
   const router = useRouter();
   const friends: FriendsList[] = useSelector(selectFriends);
   const dispatch = useDispatch();
@@ -161,7 +165,7 @@ const Post = (props: PostProps) => {
             return p;
           });
           /* @ts-ignore */
-          setPosts(newState);
+          dispatch(setPosts(newState));
         } else {
           setErr("Can't like right now. Try again later.");
         }
@@ -200,7 +204,7 @@ const Post = (props: PostProps) => {
             return p;
           });
           /* @ts-ignore */
-          setPosts(newState);
+          dispatch(setPosts(newState));
         } else {
           setErr("Can't unlike right now. Try again later.");
         }
@@ -272,7 +276,8 @@ const Post = (props: PostProps) => {
                   /* @ts-ignore */ new Date(
                     post?.created_at
                   ).toDateString() /* @ts-ignore */
-                }
+                }{" "}
+                -{" "}
                 {
                   /* @ts-ignore */ new Date(
                     post?.created_at

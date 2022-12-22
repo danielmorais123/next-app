@@ -17,18 +17,19 @@ import { useRouter } from "next/router";
 import { Badge, Dropdown, Menu, MenuProps } from "antd";
 import { anton, poppins } from "../fonts/fonts";
 import { BASE_URL } from "../lib/baseUrls";
-import { Notification } from "../types/typing";
-import { useDispatch } from "react-redux";
-import { addFriend } from "../redux/slices/friendsSlice";
+import { Notification, PostType } from "../types/typing";
+import { useDispatch, useSelector } from "react-redux";
+import { selectPosts } from "../redux/slices/postSlice";
+import { STORAGE_URL } from "../lib/supabase";
 
 const Navbar = (props: any) => {
-  const dispath = useDispatch();
-
+  const [showResults, setShowResults] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<Notification>();
+  const [searchInput, setSearchInput] = useState<string>("");
   const { user } = useAuth();
   const { setOpen } = props;
   const router = useRouter();
-
+  const posts: PostType[] = useSelector(selectPosts);
   useEffect(() => {
     if (!user) return;
     fetch(`${BASE_URL}/api/notifications/${user?.id}`)
@@ -113,10 +114,14 @@ const Navbar = (props: any) => {
             Social Network{" "}
           </p>
         </div>
-        <div className="md:w-[30%] mx-auto">
+        <div className="md:w-[30%] mx-auto relative">
           <form className="relative cursor-pointer hidden md:flex">
             <input
+              onBlur={() => setShowResults(false)}
+              onClick={() => setShowResults(true)}
               type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search..."
               className="h-8 w-[20px]  md:w-full py-5 pl-7 rounded-lg border-none text-sm outline-none tracking-wide bg-[#2c2c2c] placeholder-gray-400"
             />
@@ -125,6 +130,66 @@ const Navbar = (props: any) => {
               className="absolute md:right-5 text-gray-400 top-3 right-3 md:top-3"
             />
           </form>
+          {showResults ? (
+            <ul className="absolute bg-[#2c2c2c] w-full mt-2 py-2 rounded-lg max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#6C63FF] scrollbar-track-gray-100">
+              <li className="w-[95%] mx-auto text-sm">Posts</li>
+              <div className="border border-gray-700/40 w-[97%] mx-auto mt-1" />
+              {posts
+                .filter((p) =>
+                  p.comment?.toLowerCase().includes(searchInput.toLowerCase())
+                )
+                .map((post, index) => (
+                  <>
+                    <div
+                      key={post._id}
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#202020] transition-all cursor-pointer hover:rounded-lg "
+                    >
+                      <img
+                        src={`${STORAGE_URL}${post.fileName}`}
+                        className="h-[60px] p-1 object-contain rounded-lg"
+                      />
+                    </div>
+                    <div
+                      key={post._id}
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
+                    >
+                      <img
+                        src={`${STORAGE_URL}${post.fileName}`}
+                        className="h-[60px] p-1 object-contain rounded-lg"
+                      />
+                    </div>
+                    <div
+                      key={post._id}
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
+                    >
+                      <img
+                        src={`${STORAGE_URL}${post.fileName}`}
+                        className="h-[60px] p-1 object-contain rounded-lg"
+                      />
+                    </div>
+                    <div
+                      key={post._id}
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
+                    >
+                      <img
+                        src={`${STORAGE_URL}${post.fileName}`}
+                        className="h-[60px] p-1 object-contain rounded-lg"
+                      />
+                    </div>
+                    <div
+                      key={post._id}
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
+                    >
+                      <img
+                        src={`${STORAGE_URL}${post.fileName}`}
+                        className="h-[60px] p-1 object-contain rounded-lg"
+                      />
+                    </div>
+                  </>
+                ))}
+              <div className="border border-gray-700/40 w-[97%] mx-auto mt-1" />
+            </ul>
+          ) : null}
         </div>
         <div className="flex items-center">
           <ul className="md:flex space-x-7 items-center hidden ">
