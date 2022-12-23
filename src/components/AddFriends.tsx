@@ -17,12 +17,14 @@ import {
   selectFriends,
 } from "../redux/slices/friendsSlice";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 const AddFriends = () => {
   const { user } = useAuth();
   const [toAddUsers, setToAddUsers] = useState<UserToAdd[]>([]);
   const [err, setErr] = useState("");
   const dispatch = useDispatch();
+  const router = useRouter();
   const friends: FriendsList[] = useSelector(selectFriends);
 
   console.log({ friends });
@@ -120,6 +122,7 @@ const AddFriends = () => {
                 <div className="flex items-center ">
                   <img
                     /* @ts-ignore */
+                    onClick={() => router.push(`/profile/${toAddUser?._id}`)}
                     id={`${toAddUser?._id}`}
                     alt="User Pic"
                     onError={(e) =>
@@ -151,7 +154,7 @@ const AddFriends = () => {
                     ) ? (
                       <FontAwesomeIcon
                         icon={faEnvelopeCircleCheck}
-                        className="bg-indigo-500 p-2 rounded-full text-sm cursor-pointer"
+                        className="bg-indigo-500 p-2 rounded-full text-sm "
                       />
                     ) : null}
                     {friends?.some(

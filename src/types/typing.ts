@@ -35,6 +35,7 @@ export interface UserToAdd {
   displayName: string | null;
   emailConfirmed: boolean | null;
   _id: string | null;
+  provider: string | null;
 }
 
 export interface Notification {

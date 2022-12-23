@@ -17,10 +17,11 @@ import { useRouter } from "next/router";
 import { Badge, Dropdown, Menu, MenuProps } from "antd";
 import { anton, poppins } from "../fonts/fonts";
 import { BASE_URL } from "../lib/baseUrls";
-import { Notification, PostType } from "../types/typing";
+import { Notification, PostType, UserToAdd } from "../types/typing";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPosts } from "../redux/slices/postSlice";
 import { STORAGE_URL } from "../lib/supabase";
+import { selectUsers, setUsers } from "../redux/slices/usersSlice";
 
 const Navbar = (props: any) => {
   const [showResults, setShowResults] = useState<boolean>(false);
@@ -30,6 +31,15 @@ const Navbar = (props: any) => {
   const { setOpen } = props;
   const router = useRouter();
   const posts: PostType[] = useSelector(selectPosts);
+  const dispatch = useDispatch();
+  const users: UserToAdd[] = useSelector(selectUsers);
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/api/users`)
+      .then((res) => res.json())
+      .then((data) => dispatch(setUsers(data.users)));
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     fetch(`${BASE_URL}/api/notifications/${user?.id}`)
@@ -132,8 +142,13 @@ const Navbar = (props: any) => {
           </form>
           {showResults ? (
             <ul className="absolute bg-[#2c2c2c] w-full mt-2 py-2 rounded-lg max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-[#6C63FF] scrollbar-track-gray-100">
-              <li className="w-[95%] mx-auto text-sm">Posts</li>
-              <div className="border border-gray-700/40 w-[97%] mx-auto mt-1" />
+              {posts.length > 0 ? (
+                <>
+                  <li className="w-[95%] mx-auto text-sm">Posts</li>
+                  <div className="border border-gray-700/40 w-[97%] mx-auto mt-1" />
+                </>
+              ) : null}
+
               {posts
                 .filter((p) =>
                   p.comment?.toLowerCase().includes(searchInput.toLowerCase())
@@ -142,52 +157,60 @@ const Navbar = (props: any) => {
                   <>
                     <div
                       key={post._id}
-                      className="mt-2 w-[95%] mx-auto hover:bg-[#202020] transition-all cursor-pointer hover:rounded-lg "
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#202020] transition-all cursor-pointer hover:rounded-lg flex items-center "
                     >
                       <img
                         src={`${STORAGE_URL}${post.fileName}`}
                         className="h-[60px] p-1 object-contain rounded-lg"
                       />
-                    </div>
-                    <div
-                      key={post._id}
-                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
-                    >
-                      <img
-                        src={`${STORAGE_URL}${post.fileName}`}
-                        className="h-[60px] p-1 object-contain rounded-lg"
-                      />
-                    </div>
-                    <div
-                      key={post._id}
-                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
-                    >
-                      <img
-                        src={`${STORAGE_URL}${post.fileName}`}
-                        className="h-[60px] p-1 object-contain rounded-lg"
-                      />
-                    </div>
-                    <div
-                      key={post._id}
-                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
-                    >
-                      <img
-                        src={`${STORAGE_URL}${post.fileName}`}
-                        className="h-[60px] p-1 object-contain rounded-lg"
-                      />
-                    </div>
-                    <div
-                      key={post._id}
-                      className="mt-2 w-[95%] mx-auto hover:bg-[#6C63FF] transition-all cursor-pointer hover:rounded-lg "
-                    >
-                      <img
-                        src={`${STORAGE_URL}${post.fileName}`}
-                        className="h-[60px] p-1 object-contain rounded-lg"
-                      />
+                      <div>
+                        <p className="text-xs ml-1 line-clamp-2">
+                          {post.comment}
+                        </p>
+                      </div>
                     </div>
                   </>
                 ))}
-              <div className="border border-gray-700/40 w-[97%] mx-auto mt-1" />
+              {posts.length > 0 ? (
+                <div className="border border-gray-700/40 w-[97%] mx-auto mt-1" />
+              ) : null}
+              <li className="w-[95%] mx-auto text-sm mt-2">Users</li>
+              {users
+                .filter((u) =>
+                  u.displayName
+                    ?.toLowerCase()
+                    .includes(searchInput.toLowerCase())
+                )
+                .map((u, index) => (
+                  <>
+                    <div
+                      key={u._id}
+                      className="mt-2 w-[95%] mx-auto hover:bg-[#202020] transition-all cursor-pointer hover:rounded-lg flex items-center "
+                    >
+                      <img
+                        id={`friends_user_${u?._id}`}
+                        onError={(e) =>
+                          /* @ts-ignore */
+                          (e.target.src =
+                            "https://img.freepik.com/premium-vector/female-user-profile-avatar-is-woman-character-screen-saver-with-emotions_505620-617.jpg?w=2000")
+                        }
+                        src={`${
+                          (u?.provider === "Google" ||
+                            u?.provider === "Facebook") &&
+                          u?.photoUrl?.startsWith("http")
+                            ? u?.photoUrl
+                            : `${STORAGE_URL}/${u?.photoUrl}`
+                        }`}
+                        className="h-[60px] p-1 object-contain rounded-lg"
+                      />
+                      <div>
+                        <p className="text-xs ml-1 line-clamp-2">
+                          {u?.displayName}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ))}
             </ul>
           ) : null}
         </div>
@@ -197,6 +220,7 @@ const Navbar = (props: any) => {
               <FontAwesomeIcon
                 icon={faUser}
                 className="cursor-pointer w-[15px] h-[15px]"
+                onClick={() => router.push("/profile")}
               />
             </li>{" "}
             <li>
